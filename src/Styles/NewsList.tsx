@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 
+// https://www.color-hex.com/color/8bb1ff
 const width = Dimensions.get("window").width;
 
 const NewsList_Styled = StyleSheet.create({
