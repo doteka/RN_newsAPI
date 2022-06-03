@@ -1,38 +1,79 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  Button,
+  Pressable,
+} from "react-native";
 import { useFetch } from "../Hooks/useFetch";
+import { newsFetch } from "../Hooks/newsFetch";
+
+import axios from "axios";
 
 import NewsList from "./NewsList";
 import Input from "./Input";
-import { useEffect } from "react";
-let URL =
-  "https://newsapi.org/v2/everything?q=지선&sortBy=popularity&pageSize=5&apiKey=4ff91c06afd04b30b3abc6e6d9b7658b";
+import { useEffect, useState } from "react";
 
-const _onSearch = (keyword) => {
-  URL =
-    "https://newsapi.org/v2/everything?q=" +
-    keyword +
-    "&sortBy=popularity&pageSize=5&apiKey=4ff91c06afd04b30b3abc6e6d9b7658b";
-
-  console.log("C");
-};
+let URL = "";
 
 const App = () => {
-  const { data, error, inProgress } = useFetch(URL);
-  // let d = JSON.parse(data);
-  console.log(data);
+  const [keyWord, setKeyWord] = useState("");
+  const [newsData, setNewsData] = useState(null);
+  const [headLineView, setHeadLineView] = useState(true);
+  // let { data, error, inProgress } = useFetch(URL);
+  const _onSearch = (keyword) => {
+    setKeyWord(keyword);
+    setHeadLineView(false);
+  };
+
+  useEffect(() => {
+    if (headLineView) {
+      URL =
+        "https://newsapi.org/v2/top-headlines?country=kr&pageSize=5&apiKey=4ff91c06afd04b30b3abc6e6d9b7658b";
+    } else {
+      URL =
+        "https://newsapi.org/v2/everything?q=" +
+        keyWord +
+        "&sortBy=popularity&pageSize=5&apiKey=4ff91c06afd04b30b3abc6e6d9b7658b";
+    }
+    const fetchData = async () => {
+      try {
+        const response = await axios({
+          method: "get",
+          url: URL,
+          timeout: 2000,
+        });
+        setNewsData(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, [keyWord, headLineView]);
 
   return (
-    <View style={styles.container}>
-      {!inProgress &&
-        data?.articles.map((item) => {
-          return (
-            <NewsList title={item.title} img={item.urlToImage} url={item.url} />
-          );
-        })}
+    <SafeAreaView style={styles.container}>
+      {newsData?.articles.map((item) => {
+        return (
+          <NewsList title={item.title} img={item.urlToImage} url={item.url} />
+        );
+      })}
       <Input Search={_onSearch} />
+      <Pressable style={styles.mainBtn}>
+        <Text
+          onPress={() => {
+            console.log("C");
+            setHeadLineView(true);
+          }}
+        >
+          메인으로 가기
+        </Text>
+      </Pressable>
       <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -42,6 +83,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  mainBtn: {
+    backgroundColor: "#D0DFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+    margin: 3,
   },
 });
 
