@@ -19,6 +19,9 @@ const NewsList_Styled = StyleSheet.create({
     fontSize: 15,
     color: "#fff",
   },
+  Highlight: {
+    backgroundColor: "yellow",
+  },
   NewsImg: {
     resizeMode: "contain",
     width: "150%",
